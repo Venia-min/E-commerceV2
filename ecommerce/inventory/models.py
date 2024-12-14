@@ -251,3 +251,82 @@ class ProductInventory(models.Model):
 
     def __str__(self):
         return self.product.name
+
+
+class Media(models.Model):
+    """
+    Product image table
+    """
+
+    product_inventory = models.ForeignKey(
+        ProductInventory,
+        on_delete=models.PROTECT,
+        related_name="media_product_inventory",
+    )
+    image = models.ImageField(
+        null=False,
+        unique=False,
+        blank=False,
+        verbose_name=_("product image"),
+        upload_to="images/",
+        help_text=_("format: required, default-default.png"),
+    )
+    alt_text = models.CharField(
+        max_length=255,
+        null=False,
+        unique=False,
+        blank=False,
+        verbose_name=_("alternative text"),
+        help_text=_("format: required, max-255"),
+    )
+    is_feature = models.BooleanField(
+        default=False,
+        verbose_name=_("product default image"),
+        help_text=_("format: default=false, true=default image"),
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        editable=False,
+        verbose_name=_("date image added"),
+        help_text=_("format: Y-m-d H:M:S"),
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name=_("date image updated"),
+        help_text=_("format: Y-m-d H:M:S"),
+    )
+
+    class Meta:
+        verbose_name = _("product image")
+        verbose_name_plural = _("product images")
+
+
+class Stock(models.Model):
+    product_inventory = models.OneToOneField(
+        ProductInventory,
+        related_name="product_inventory",
+        on_delete=models.PROTECT,
+    )
+    last_checked = models.DateTimeField(
+        null=True,
+        unique=False,
+        blank=True,
+        verbose_name=_("inventory stock check date"),
+        help_text=_("format: Y-m-d H:M:S, null-true, blank-true"),
+    )
+    units = models.IntegerField(
+        default=0,
+        null=False,
+        unique=False,
+        blank=False,
+        verbose_name=_("units/qty of stock"),
+        help_text=_("format: required, default-0"),
+    )
+    units_sold = models.IntegerField(
+        default=0,
+        null=False,
+        unique=False,
+        blank=False,
+        verbose_name=_("units sold to data"),
+        help_text=_("format: required, default-0"),
+    )
