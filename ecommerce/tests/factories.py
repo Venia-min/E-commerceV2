@@ -105,6 +105,28 @@ class ProductAttributeValueFactory(factory.django.DjangoModelFactory):
     attribute_value = fake.lexify(text="attribute_value_??????")
 
 
+class ProductAttributeValuesFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.ProductAttributeValues
+
+    attribute_values = factory.SubFactory(ProductAttributeValueFactory)
+    product_inventory = factory.SubFactory(ProductInventoryFactory)
+
+
+class ProductWithAttributeValuesFactory(ProductInventoryFactory):
+    class Meta:
+        skip_postgeneration_save = True
+
+    attributevalues1 = factory.RelatedFactory(
+        ProductAttributeValuesFactory,
+        factory_related_name="product_inventory",
+    )
+    attributevalues2 = factory.RelatedFactory(
+        ProductAttributeValuesFactory,
+        factory_related_name="product_inventory",
+    )
+
+
 register(CategoryFactory)
 register(ProductFactory)
 register(ProductTypeFactory)
@@ -114,3 +136,5 @@ register(MediaFactory)
 register(StockFactory)
 register(ProductAttributeFactory)
 register(ProductAttributeValueFactory)
+register(ProductAttributeValuesFactory)
+register(ProductWithAttributeValuesFactory)
