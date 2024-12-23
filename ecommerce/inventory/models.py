@@ -246,7 +246,7 @@ class ProductInventory(models.Model):
     )
     attribute_values = models.ManyToManyField(
         ProductAttributeValue,
-        related_name="product_inventory",
+        related_name="productinventory",
         through="ProductAttributeValues",
     )
     is_active = models.BooleanField(
@@ -428,7 +428,7 @@ class ProductAttributeValues(models.Model):
     )
     product_inventory = models.ForeignKey(
         ProductInventory,
-        related_name="attribute_values",
+        related_name="attributevalues",
         on_delete=models.PROTECT,
     )
 
@@ -443,7 +443,7 @@ class ProductTypeAttribute(models.Model):
 
     product_attribute = models.ForeignKey(
         ProductAttribute,
-        related_name="product_type",
+        related_name="producttype",
         on_delete=models.PROTECT,
     )
     product_type = models.ForeignKey(
