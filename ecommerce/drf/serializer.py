@@ -45,15 +45,16 @@ class AllProducts(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ["name"]
+        fields = ["name", "slug", "is_active"]
+        read_only = True
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    # category = CategorySerializer(many=True)
+    # category = CategorySerializer()
 
     class Meta:
         model = Product
-        fields = ["name"]
+        fields = ["name", "web_id"]
         read_only = True
         editable = False
 
