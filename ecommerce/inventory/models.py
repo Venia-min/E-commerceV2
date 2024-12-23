@@ -19,13 +19,13 @@ class Category(MPTTModel):
     slug = models.SlugField(
         max_length=150,
         null=False,
-        unique=False,
+        unique=True,
         blank=False,
         verbose_name=_("category safe URL"),
         help_text=_("format: required, letters, numbers, underscore, or hyphens"),
     )
     is_active = models.BooleanField(
-        default=True,
+        default=False,
     )
     parent = TreeForeignKey(
         "self",
@@ -42,6 +42,7 @@ class Category(MPTTModel):
         order_insertion_by = ["name"]
 
     class Meta:
+        ordering = ["name"]
         verbose_name = _("product category")
         verbose_name_plural = _("product categories")
 
@@ -81,16 +82,22 @@ class Product(models.Model):
     description = models.TextField(
         null=False,
         unique=False,
-        blank=False,
+        blank=True,
         verbose_name=_("product description"),
         help_text=_("format: required"),
     )
-    category = TreeManyToManyField(Category)
+    category = models.ForeignKey(
+        Category,
+        related_name="product",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
     is_active = models.BooleanField(
         null=False,
         unique=False,
         blank=False,
-        default=True,
+        default=False,
         verbose_name=_("product visibility"),
         help_text=_("format: true=product visible"),
     )
@@ -104,24 +111,6 @@ class Product(models.Model):
         auto_now=True,
         verbose_name=_("date product last updated"),
         help_text=_("format: Y-m-d H:M:S"),
-    )
-
-    def __str__(self):
-        return self.name
-
-
-class ProductType(models.Model):
-    """
-    Product type table
-    """
-
-    name = models.CharField(
-        max_length=255,
-        null=False,
-        unique=True,
-        blank=False,
-        verbose_name=_("type of product"),
-        help_text=_("format: required, unique, max-255"),
     )
 
     def __str__(self):
@@ -142,6 +131,9 @@ class Brand(models.Model):
         help_text=_("format: required, unique, max-255"),
     )
 
+    def __str__(self):
+        return self.name
+
 
 class ProductAttribute(models.Model):
     """
@@ -159,9 +151,32 @@ class ProductAttribute(models.Model):
     description = models.TextField(
         null=False,
         unique=False,
-        blank=False,
+        blank=True,
         verbose_name=_("product attribute description"),
         help_text=_("format: required"),
+    )
+
+    def __str__(self):
+        return self.name
+
+
+class ProductType(models.Model):
+    """
+    Product type table
+    """
+
+    name = models.CharField(
+        max_length=255,
+        null=False,
+        unique=True,
+        blank=False,
+        verbose_name=_("type of product"),
+        help_text=_("format: required, unique, max-255"),
+    )
+    product_attributes = models.ManyToManyField(
+        ProductAttribute,
+        related_name="product_type",
+        through="ProductTypeAttribute",
     )
 
     def __str__(self):
@@ -175,7 +190,7 @@ class ProductAttributeValue(models.Model):
 
     product_attribute = models.ForeignKey(
         ProductAttribute,
-        related_name="product_attribute",
+        related_name="product_attribute_value",
         on_delete=models.PROTECT,
     )
     attribute_value = models.CharField(
@@ -214,28 +229,35 @@ class ProductInventory(models.Model):
     )
     product_type = models.ForeignKey(
         ProductType,
-        related_name="product_type",
+        related_name="product_inventory",
         on_delete=models.PROTECT,
     )
     product = models.ForeignKey(
         Product,
-        related_name="product",
+        related_name="product_inventory",
         on_delete=models.PROTECT,
     )
     brand = models.ForeignKey(
         Brand,
-        related_name="brand",
-        on_delete=models.PROTECT,
+        related_name="product_inventory",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
     )
     attribute_values = models.ManyToManyField(
         ProductAttributeValue,
-        related_name="product_attribute_values",
+        related_name="product_inventory",
         through="ProductAttributeValues",
     )
     is_active = models.BooleanField(
-        default=True,
+        default=False,
         verbose_name=_("product visibility"),
-        help_text=_("format: true=product visible"),
+        help_text=_("format: true=product visible, default=false"),
+    )
+    is_default = models.BooleanField(
+        default=False,
+        verbose_name=_("default product"),
+        help_text=_("format: true=default product, default=false"),
     )
     retail_price = models.DecimalField(
         max_digits=5,
@@ -279,6 +301,16 @@ class ProductInventory(models.Model):
             },
         },
     )
+    is_on_sale = models.BooleanField(
+        default=False,
+        verbose_name=_("product on sale"),
+        help_text=_("format: true=product on sale, default=false"),
+    )
+    is_digital = models.BooleanField(
+        default=False,
+        verbose_name=_("product is digital"),
+        help_text=_("format: true=product is digital, default=false"),
+    )
     weight = models.FloatField(
         null=False,
         unique=False,
@@ -298,7 +330,7 @@ class ProductInventory(models.Model):
     )
 
     def __str__(self):
-        return self.product.name
+        return self.sku
 
 
 class Media(models.Model):
@@ -309,9 +341,9 @@ class Media(models.Model):
     product_inventory = models.ForeignKey(
         ProductInventory,
         on_delete=models.PROTECT,
-        related_name="media_product_inventory",
+        related_name="media",
     )
-    image = models.ImageField(
+    img_url = models.ImageField(
         null=False,
         unique=False,
         blank=False,
@@ -350,9 +382,13 @@ class Media(models.Model):
 
 
 class Stock(models.Model):
+    """
+    Product stock table
+    """
+
     product_inventory = models.OneToOneField(
         ProductInventory,
-        related_name="product_inventory",
+        related_name="stock",
         on_delete=models.PROTECT,
     )
     last_checked = models.DateTimeField(
@@ -386,15 +422,35 @@ class ProductAttributeValues(models.Model):
     """
 
     attribute_values = models.ForeignKey(
-        "ProductAttributeValue",
-        related_name="attribute_values",
+        ProductAttributeValue,
+        related_name="product_attribute_values",
         on_delete=models.PROTECT,
     )
     product_inventory = models.ForeignKey(
         ProductInventory,
-        related_name="product_attribute_values",
+        related_name="attribute_values",
         on_delete=models.PROTECT,
     )
 
     class Meta:
         unique_together = (("attribute_values", "product_inventory"),)
+
+
+class ProductTypeAttribute(models.Model):
+    """
+    Product type link table
+    """
+
+    product_attribute = models.ForeignKey(
+        ProductAttribute,
+        related_name="product_type",
+        on_delete=models.PROTECT,
+    )
+    product_type = models.ForeignKey(
+        ProductType,
+        related_name="attribute",
+        on_delete=models.PROTECT,
+    )
+
+    class Meta:
+        unique_together = (("product_attribute", "product_type"),)
