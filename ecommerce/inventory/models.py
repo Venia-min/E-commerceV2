@@ -173,7 +173,7 @@ class ProductType(models.Model):
         verbose_name=_("type of product"),
         help_text=_("format: required, unique, max-255"),
     )
-    product_attributes = models.ManyToManyField(
+    product_type_attributes = models.ManyToManyField(
         ProductAttribute,
         related_name="product_type",
         through="ProductTypeAttribute",

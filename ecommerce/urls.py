@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 
-from ecommerce.drf.views import CategoryList, ProductByCategory
+from ecommerce.drf.views import CategoryList, ProductByCategory, ProductInventoryByWebId
 
 # from rest_framework import routers
 # from ecommerce.drf import views
@@ -19,6 +19,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/inventory/category/all", CategoryList.as_view()),
     path("api/inventory/products/category/<str:query>/", ProductByCategory.as_view()),
+    path("api/inventory/<int:query>/", ProductInventoryByWebId.as_view()),
     # path("demo/", include("ecommerce.demo.urls", namespace="demo")),
     # path("", include(router.urls)),
     # path("search/<str:query>/", SearchProductInventory.as_view()),

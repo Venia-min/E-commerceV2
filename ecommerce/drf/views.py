@@ -60,3 +60,14 @@ class ProductByCategory(APIView):
         queryset = Product.objects.filter(category__slug=query)
         serializer = ProductSerializer(queryset, many=True)
         return Response(serializer.data)
+
+
+class ProductInventoryByWebId(APIView):
+    """
+    Return Sub Product by WebId
+    """
+
+    def get(self, requst, query=None):
+        queryset = ProductInventory.objects.filter(product__web_id=query)
+        serializer = ProductInventorySerializer(queryset, many=True)
+        return Response(serializer.data)

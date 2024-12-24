@@ -10,15 +10,16 @@ from ecommerce.inventory.models import (
 
 
 class MediaSerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField()
+    img_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Media
-        fields = ["image", "alt_text"]
+        fields = ["img_url", "alt_text"]
         read_only = True
+        editable = False
 
-    def get_image(self, obj):
-        return self.context["request"].build_absolute_uri(obj.image.url)
+    def get_img_url(self, obj):
+        return obj.img_url.url
 
 
 class ProductAttributeValueSerializer(serializers.ModelSerializer):
@@ -26,12 +27,14 @@ class ProductAttributeValueSerializer(serializers.ModelSerializer):
         model = ProductAttributeValue
         exclude = ["id"]
         depth = 2
+        read_only = True
 
 
 class BrandSerializer(serializers.ModelSerializer):
     class Meta:
         model = Brand
         fields = ["name"]
+        read_only = True
 
 
 class AllProducts(serializers.ModelSerializer):
@@ -60,10 +63,12 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class ProductInventorySerializer(serializers.ModelSerializer):
-    # brand = BrandSerializer(many=False, read_only=True)
-    # attribute = ProductAttributeValueSerializer(source="attribute_values", many=True)
-    # image = MediaSerializer(source="media_product_inventory", many=True)
 
+    brand = BrandSerializer(many=False, read_only=True)
+    attributes = ProductAttributeValueSerializer(
+        source="attribute_values", many=True, read_only=True
+    )
+    media = MediaSerializer(many=True, read_only=True)
     product = ProductSerializer(many=False, read_only=True)
 
     class Meta:
@@ -71,13 +76,14 @@ class ProductInventorySerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "sku",
-            # "image",
             "store_price",
-            "is_active",
+            "is_default",
+            "brand",
             "product",
-            # "product_type",
-            # "brand",
-            # "attribute",
+            "is_on_sale",
+            "weight",
+            "media",
+            "attributes",
+            "product_type",
         ]
         read_only = True
-        depth = 2
