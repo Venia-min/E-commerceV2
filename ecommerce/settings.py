@@ -38,7 +38,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # Local applications
-    "ecommerce.dashboard",
     "ecommerce.inventory",
     "ecommerce.drf",
     # Demo applications
@@ -149,9 +148,4 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 10,
 }
 
-ELASTICSEARCH_DSL = {
-    "default": {
-        "hosts": "http://localhost:9200",
-        "http_auth": ("elastic", "password"),
-    }
-}
+ELASTICSEARCH_DSL = {"default": {"hosts": "http://localhost:9200"}}

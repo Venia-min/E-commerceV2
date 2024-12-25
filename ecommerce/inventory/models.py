@@ -421,19 +421,19 @@ class ProductAttributeValues(models.Model):
     Product attribute values link table
     """
 
-    attribute_values = models.ForeignKey(
+    attributevalues = models.ForeignKey(
         ProductAttributeValue,
         related_name="product_attribute_values",
         on_delete=models.PROTECT,
     )
-    product_inventory = models.ForeignKey(
+    productinventory = models.ForeignKey(
         ProductInventory,
         related_name="attributevalues",
         on_delete=models.PROTECT,
     )
 
     class Meta:
-        unique_together = (("attribute_values", "product_inventory"),)
+        unique_together = (("attributevalues", "productinventory"),)
 
 
 class ProductTypeAttribute(models.Model):

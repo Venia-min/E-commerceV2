@@ -1,27 +1,31 @@
-from re import search
-
 from django.http import HttpResponse
-from elasticsearch_dsl.serializer import serializer
 from rest_framework.views import APIView
 from rest_framework.pagination import LimitOffsetPagination
 from elasticsearch_dsl import Q
 
-from ecommerce.drf.serializer import ProductInventorySerializer
+from ecommerce.drf.serializer import ProductInventorySearchSerializer
 from ecommerce.search.documents import ProductInventoryDocument
 
 
 class SearchProductInventory(APIView, LimitOffsetPagination):
-    productinventory_serializer = ProductInventorySerializer
+    """
+    View for search in product.name, product.web_id, brand.name
+    endpoint: api/search/<str:query>/
+    """
+
+    productinventory_serializer = ProductInventorySearchSerializer
     search_document = ProductInventoryDocument
 
     def get(self, request, query):
         try:
             q = Q(
-                "multi_match", query=query, fields=["product.name"], fuzziness="auto"
+                "multi_match",
+                query=query,
+                fields=["product.name", "product.web_id", "brand.name"],
+                fuzziness="auto",
             ) & Q(
-                "bool",
                 should=[
-                    Q("match", is_active=True),
+                    Q("match", is_default=True),
                 ],
                 minimum_should_match=1,
             )
