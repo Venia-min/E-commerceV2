@@ -1,6 +1,9 @@
+from decimal import Decimal
+
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from mptt.models import MPTTModel, TreeForeignKey, TreeManyToManyField
+from mptt.models import MPTTModel, TreeForeignKey
 
 
 class Category(MPTTModel):
@@ -260,51 +263,22 @@ class ProductInventory(models.Model):
         help_text=_("format: true=default product, default=false"),
     )
     retail_price = models.DecimalField(
-        max_digits=5,
+        max_digits=10,
         decimal_places=2,
         null=False,
         unique=False,
         blank=False,
         verbose_name=_("recommended retail price"),
-        help_text=_("format: maximum price 999.99"),
-        error_messages={
-            "name": {
-                "max_length": _("the price must be between 0 and 999.99"),
-            },
-        },
+        validators=[MinValueValidator(Decimal("0.01"))],
     )
     store_price = models.DecimalField(
-        max_digits=5,
+        max_digits=10,
         decimal_places=2,
         null=False,
         unique=False,
         blank=False,
         verbose_name=_("regular store price"),
-        help_text=_("format: maximum price 999.99"),
-        error_messages={
-            "name": {
-                "max_length": _("the price must be between 0 and 999.99"),
-            },
-        },
-    )
-    sale_price = models.DecimalField(
-        max_digits=5,
-        decimal_places=2,
-        null=False,
-        unique=False,
-        blank=False,
-        verbose_name=_("sale price"),
-        help_text=_("format: maximum price 999.99"),
-        error_messages={
-            "name": {
-                "max_length": _("the price must be between 0 and 999.99"),
-            },
-        },
-    )
-    is_on_sale = models.BooleanField(
-        default=False,
-        verbose_name=_("product on sale"),
-        help_text=_("format: true=product on sale, default=false"),
+        validators=[MinValueValidator(Decimal("0.01"))],
     )
     is_digital = models.BooleanField(
         default=False,
