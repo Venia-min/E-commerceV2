@@ -1,0 +1,11 @@
+.dockerignore
+.gitignore
+.venv
+.env
+env/
+venv/
+.idea
+.pytest_cache
+readme.md
+__pycache__
+db.sqlite3

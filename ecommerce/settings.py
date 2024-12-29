@@ -96,7 +96,7 @@ DATABASES = {
         "NAME": "postgres",
         "USER": "postgres",
         "PASSWORD": "postgres",
-        "HOST": "127.0.0.1",
+        "HOST": "pgdb",
         "PORT": "5432",
     }
 }
@@ -148,4 +148,4 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 10,
 }
 
-ELASTICSEARCH_DSL = {"default": {"hosts": "http://localhost:9200"}}
+ELASTICSEARCH_DSL = {"default": {"hosts": "http://elasticsearch:9200"}}
