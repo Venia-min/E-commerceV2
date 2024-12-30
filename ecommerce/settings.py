@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     # Local applications
     "ecommerce.inventory",
     "ecommerce.drf",
+    "ecommerce.promotion",
     # Demo applications
     "ecommerce.demo",
     "ecommerce.search",

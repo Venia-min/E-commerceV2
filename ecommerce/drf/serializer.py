@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from ecommerce.inventory.models import (
     Product,
     ProductInventory,
@@ -80,7 +81,6 @@ class ProductInventorySerializer(serializers.ModelSerializer):
             "is_default",
             "brand",
             "product",
-            "is_on_sale",
             "weight",
             "media",
             "attributes",
