@@ -1,4 +1,6 @@
 .dockerignore
+/docker-compose.yaml
+/Dockerfile
 .gitignore
 .venv
 .env
@@ -9,3 +11,4 @@ venv/
 readme.md
 __pycache__
 db.sqlite3
+/chromedriver

@@ -69,11 +69,11 @@ class ProductsOnPromotion(models.Model):
         max_digits=10,
         decimal_places=2,
         default=Decimal("0.00"),
-        validators=[MinValueValidator(Decimal(0.00))],
+        validators=[MinValueValidator(Decimal("0.00"))],
     )
     price_override = models.BooleanField(
         default=False,
     )
 
     class Meta:
-        unique_together = ("product_inventory_id", "promotion_id")
+        unique_together = (("product_inventory_id", "promotion_id"),)

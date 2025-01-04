@@ -36,6 +36,7 @@ def test_get_inventory_by_web_id(
                 "name": fixture.inventory.product.name,
                 "web_id": fixture.inventory.product.web_id,
             },
+            "promotion_price": None,
             "weight": fixture.inventory.weight,
             "media": [
                 {
